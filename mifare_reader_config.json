@@ -1,0 +1,29 @@
+{
+  "default_keyboard_layout": 2,
+  "manufacturer_database": {
+    "87": "Identive",
+    "29": "Gemplus",
+    "95": "NXP MIFARE Classic",
+    "75": "HID Global",
+    "33": "Atmel",
+    "16": "Texas Instruments",
+    "55": "Tönnjes C.A.R.D. International",
+    "57": "Giesecke & Devrient",
+    "21": "EM Microelectronic-Marin SA",
+    "96": "NXP MIFARE Plus",
+    "04": "NXP Semiconductors",
+    "05": "Infineon Technologies",
+    "49": "Inside Technology",
+    "28": "LEGIC Identsystems AG",
+    "47": "Orga Kartensysteme GmbH",
+    "98": "NXP MIFARE DESFire"
+  },
+  "save_logs": false,
+  "log_directory": "./logs",
+  "recent_files": [],
+  "custom_format_patterns": {
+    "@h-#d-$h-%d-e": "Card type 2 with QWERTY encoding",
+    "*h-!)d-e": "Card type 1 with QWERTY encoding",
+    "*h-e": "Card type 3 with QWERTY encoding"
+  }
+}
