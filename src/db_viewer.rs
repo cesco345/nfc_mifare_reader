@@ -7,7 +7,7 @@ use fltk::{
     button::Button, 
     dialog,
     frame::Frame,
-    group::{Group, Pack},
+    group::{Group, Flex, Pack, Scroll},
     draw,
 };
 use std::cell::RefCell;
@@ -15,18 +15,28 @@ use std::rc::Rc;
 
 pub fn show_database_viewer(inventory_ui: &Rc<crate::inventory::ui::actions::InventoryUI>) {
     // Create the main window
+    let app = app::App::default();
     let mut win = Window::new(100, 100, 960, 620, "Database Viewer");
     win.make_modal(true);
     
-    // Create a container group for layout management
-    let mut main_group = Group::new(0, 0, 960, 620, "");
+    // Use a flex layout for better resizing behavior
+    let mut flex = Flex::new(0, 0, 960, 620, None);
+    flex.set_type(fltk::group::FlexType::Column);
+    flex.set_margin(10);
     
     // Create a frame for the header
-    let mut header = Frame::new(10, 10, 940, 30, "Inventory Database");
+    let mut header = Frame::new(0, 0, 940, 30, "Inventory Database");
     header.set_label_size(18);
-
-    // Create a table for the data, making it slightly shorter to leave room for buttons
-    let mut table = Table::new(10, 50, 940, 480, ""); // <-- Reduced height
+    header.set_align(fltk::enums::Align::Center);
+    flex.fixed(&header, 30);
+    
+    // Create a scrollable container for the table
+    let mut scroll = Scroll::new(0, 0, 940, 0, None);
+    scroll.set_type(fltk::group::ScrollType::Both);
+    scroll.set_scrollbar_size(15);
+    
+    // Create a table for the data
+    let mut table = Table::new(0, 0, 940, 500, "");
     table.set_rows(0);
     table.set_row_header(true);
     table.set_row_resize(true);
@@ -39,7 +49,9 @@ pub fn show_database_viewer(inventory_ui: &Rc<crate::inventory::ui::actions::Inv
     table.set_col_width(4, 130); // Location
     table.set_col_width(5, 140); // Created
     table.set_col_width(6, 140); // Updated
-
+    
+    scroll.end();
+    
     // Get data from database
     let items = match inventory_ui.inventory_db.borrow().get_all_items() {
         Ok(items) => items,
@@ -122,43 +134,48 @@ pub fn show_database_viewer(inventory_ui: &Rc<crate::inventory::ui::actions::Inv
             t.redraw();
         }
     });
-
-    // Create a horizontal pack for the buttons to ensure proper layout
-    let mut button_pack = Pack::new(10, 540, 940, 40, "");
-    button_pack.set_type(fltk::group::PackType::Horizontal);
-    button_pack.set_spacing(10);
     
-    // Add count display first
+    // Create a pack for buttons at the bottom
+    let mut button_flex = Flex::new(0, 0, 940, 40, None);
+    button_flex.set_type(fltk::group::FlexType::Row);
+    flex.fixed(&button_flex, 40); // Fixed height for button area
+    
+    // Add count display
     let count_str = format!("{} items in database", items_data.borrow().len());
     let mut count_label = Frame::new(0, 0, 200, 30, count_str.as_str());
     count_label.set_label_size(14);
+    button_flex.fixed(&count_label, 200);
     
-    // Add an empty frame as a spacer to push buttons to the right
-    let mut spacer = Frame::new(0, 0, 260, 30, "");
+    // Add a spacer to push buttons to the right
+    let mut spacer = Frame::new(0, 0, 30, 30, "");
     
     // Create bright, visible buttons with contrasting colors
-    let mut delete_btn = Button::new(0, 0, 100, 30, "Delete");
+    let mut delete_btn = Button::new(0, 0, 0, 30, "Delete");
     delete_btn.set_color(fltk::enums::Color::from_rgb(255, 100, 100)); // Red for delete
     delete_btn.set_label_color(fltk::enums::Color::White);
+    button_flex.fixed(&delete_btn, 130);
     
-    let mut export_btn = Button::new(0, 0, 100, 30, "Export CSV");
+    let mut export_btn = Button::new(0, 0, 0, 30, "Export CSV");
     export_btn.set_color(fltk::enums::Color::from_rgb(100, 200, 100)); // Green for export
     export_btn.set_label_color(fltk::enums::Color::Black);
+    button_flex.fixed(&export_btn, 130);
     
-    let mut refresh_btn = Button::new(0, 0, 100, 30, "Refresh");
+    let mut refresh_btn = Button::new(0, 0, 0, 30, "Refresh");
     refresh_btn.set_color(fltk::enums::Color::from_rgb(100, 100, 255)); // Blue for refresh
     refresh_btn.set_label_color(fltk::enums::Color::White);
+    button_flex.fixed(&refresh_btn, 130);
     
-    let mut close_btn = Button::new(0, 0, 100, 30, "Close");
+    let mut close_btn = Button::new(0, 0, 0, 30, "Close");
     close_btn.set_color(fltk::enums::Color::from_rgb(200, 200, 200)); // Gray for close
     close_btn.set_label_color(fltk::enums::Color::Black);
+    button_flex.fixed(&close_btn, 130);
     
-    // End the button pack
-    button_pack.end();
+    button_flex.end();
+    flex.end();
     
-    // End the main group and window
-    main_group.end();
+    // End the window
     win.end();
+    win.resizable(&flex);
     
     // Set table rows
     table.set_rows(items_data.borrow().len() as i32);
