@@ -12,7 +12,7 @@ use std::rc::Rc;
 use crate::config;
 use crate::app::menu;
 use crate::app::events;
-use crate::inventory::ui::actions::InventoryUI;
+use crate::inventory::InventoryUI;
 use crate::reader;
 
 pub fn run() {

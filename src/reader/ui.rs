@@ -15,7 +15,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::utils;
-use crate::inventory::ui::actions::InventoryUI;
+use crate::inventory::InventoryUI;
 use crate::inventory::model::{create_inventory_item, generate_timestamp, InventoryItem};
 
 // Instead of a static variable, we'll use a more direct approach

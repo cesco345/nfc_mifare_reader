@@ -22,18 +22,17 @@ pub fn run_event_loop(
     keyboard_layout: Rc<RefCell<i32>>,
     app_config: Rc<RefCell<config::AppConfig>>,
     card_data_buffer: Rc<RefCell<fltk::text::TextBuffer>>,
-    inventory_ui: Rc<crate::inventory::ui::actions::InventoryUI>,
+    inventory_ui: Rc<crate::inventory::InventoryUI>,
     mut menu_items: MenuItems
 ) {
-    // Update menu items with actual data
+    // this is where we update menu items with actual data
     menu_items.keyboard_layout = keyboard_layout;
     menu_items.config = app_config;
     menu_items.card_buffer = card_data_buffer;
     menu_items.inventory_ui = inventory_ui;
     
-    // Add file check handling here if needed
-    
-    // Main event loop
+        
+    // entry point and main event loop
     while app.wait() {
         if let Some(msg) = receiver.recv() {
             handle_menu_event(msg, &menu_items);
@@ -42,7 +41,7 @@ pub fn run_event_loop(
 }
 
 fn handle_menu_event(msg: String, menu_items: &MenuItems) {
-    // Unpack menu items for convenience
+    // menu items
     let keyboard_layout = &menu_items.keyboard_layout;
     let config = &menu_items.config;
     let card_buffer = &menu_items.card_buffer;
@@ -98,7 +97,7 @@ fn handle_menu_event(msg: String, menu_items: &MenuItems) {
     }
 }
 
-// Break out handler functions to keep the match statement cleaner
+// handler functions to keep the event loop clean
 fn handle_export_csv(card_buffer: &Rc<RefCell<fltk::text::TextBuffer>>) {
     if let Some(path) = dialog::file_chooser("Export as CSV", "*.csv", ".", false) {
         let records = export::parse_display_text(&card_buffer.borrow().text());
@@ -129,7 +128,7 @@ fn handle_export_text(card_buffer: &Rc<RefCell<fltk::text::TextBuffer>>) {
     }
 }
 
-fn handle_check_files(inventory_ui: &Rc<crate::inventory::ui::actions::InventoryUI>) {
+fn handle_check_files(inventory_ui: &Rc<crate::inventory::InventoryUI>) {
     let import_dir = "./import";
     let processed_dir = "./processed";
     let error_dir = "./error";
@@ -149,7 +148,7 @@ fn handle_check_files(inventory_ui: &Rc<crate::inventory::ui::actions::Inventory
 }
 
 fn handle_gdrive_export(
-    inventory_ui: &Rc<crate::inventory::ui::actions::InventoryUI>,
+    inventory_ui: &Rc<crate::inventory::InventoryUI>,
     config: &Rc<RefCell<config::AppConfig>>
 ) {
     if config.borrow().gdrive_sync_enabled {
@@ -169,7 +168,7 @@ fn handle_gdrive_export(
 }
 
 fn handle_gdrive_import(
-    inventory_ui: &Rc<crate::inventory::ui::actions::InventoryUI>,
+    inventory_ui: &Rc<crate::inventory::InventoryUI>,
     config: &Rc<RefCell<config::AppConfig>>
 ) {
     if config.borrow().gdrive_sync_enabled {
@@ -188,7 +187,7 @@ fn handle_gdrive_import(
     }
 }
 
-fn handle_import_data(inventory_ui: &Rc<crate::inventory::ui::actions::InventoryUI>) {
+fn handle_import_data(inventory_ui: &Rc<crate::inventory::InventoryUI>) {
     if let Some(path) = dialog::file_chooser("Import data", "*.{json,csv}", ".", true) {
         if !Path::new(&path).exists() {
             dialog::alert(300, 300, &format!("File does not exist: {}", path));
@@ -223,16 +222,16 @@ fn show_preferences_dialog(
     keyboard_layout: &Rc<RefCell<i32>>,
     config: &Rc<RefCell<config::AppConfig>>
 ) {
-    // Create the window and wrap it in Rc<RefCell<>>
+    // create the preferences window and its components
     let prefs_win_rc = Rc::new(RefCell::new(fltk::window::Window::new(300, 100, 400, 300, "Preferences")));
     
-    // Use borrow_mut() to access the window for setup
+    // use Rc::borrow_mut() to modify the window
     prefs_win_rc.borrow_mut().make_modal(true);
     
-    // Create tabs for different preference categories
+    // it is important to set the end() method to make the window visible 
     let tabs = fltk::group::Tabs::new(10, 10, 380, 240, "");
     
-    // General settings tab
+    // this is the general settings tab
     let general_tab = fltk::group::Group::new(10, 35, 380, 215, "General");
     
     let mut save_logs_check = fltk::button::CheckButton::new(20, 45, 200, 25, "Save logs to file");
@@ -252,7 +251,7 @@ fn show_preferences_dialog(
     
     general_tab.end();
     
-    // Google Drive sync tab
+    // this is the Google Drive sync tab
     let gdrive_tab = fltk::group::Group::new(10, 35, 380, 215, "Google Drive");
     
     let mut gdrive_enable_check = fltk::button::CheckButton::new(20, 45, 200, 25, "Enable Google Drive sync");
@@ -270,7 +269,7 @@ fn show_preferences_dialog(
         }
     });
     
-    // Add info text about Google Drive sync
+    // lets the user know how to use Google Drive sync
     let mut gdrive_info_buffer = fltk::text::TextBuffer::default();
     gdrive_info_buffer.set_text("How to use Google Drive sync:\n\n1. Install Google Drive for Desktop\n2. Select a folder inside your Google Drive\n3. Enable sync above and set the folder path\n4. Use Export/Import menu options to sync your database");
     
@@ -281,31 +280,31 @@ fn show_preferences_dialog(
     
     tabs.end();
     
-    // OK and Cancel buttons
+    // these buttons make sure the user can save or cancel their changes
     let mut ok_button = fltk::button::Button::new(220, 260, 80, 30, "OK");
     let mut cancel_button = fltk::button::Button::new(310, 260, 80, 30, "Cancel");
     
     prefs_win_rc.borrow_mut().end();
     prefs_win_rc.borrow_mut().show();
     
-    // Make a clone of config for the OK button callback
+    // this is to clone the config and keyboard layout for the button callbacks
     let config_clone_ok = config.clone();
     let keyboard_layout_ok = keyboard_layout.clone();
     
-    // Clone for the OK button
+    // this is for cloning the window to hide it after the OK button is clicked
     let prefs_win_ok = prefs_win_rc.clone();
     ok_button.set_callback(move |_| {
-        // Update config with new values
+        // this config is mutable because we are changing the settings
         let mut config = config_clone_ok.borrow_mut();
         config.save_logs = save_logs_check.is_checked();
         config.log_directory = log_dir_input.value();
         config.default_keyboard_layout = layout_choice.value();
         
-        // Update Google Drive sync settings
+        // these are the Google Drive sync settings
         config.gdrive_sync_enabled = gdrive_enable_check.is_checked();
         config.gdrive_sync_folder = gdrive_folder_input.value();
         
-        // Create Google Drive sync folder if it doesn't exist
+        // it creates the Google Drive sync folder if it doesn't exist
         if config.gdrive_sync_enabled {
             let gdrive_path = std::path::Path::new(&config.gdrive_sync_folder);
             if !gdrive_path.exists() {
@@ -315,16 +314,16 @@ fn show_preferences_dialog(
             }
         }
         
-        // Save config to file
+        // time to save the config underscore is used to ignore the result
         let _ = config::save_config(&config);
         
-        // Update keyboard layout
+        // updates the keyboard layout and mutable because we are changing it
         *keyboard_layout_ok.borrow_mut() = config.default_keyboard_layout;
         
         prefs_win_ok.borrow_mut().hide();
     });
     
-    // Clone for the Cancel button
+    // this clones the window to hide it after the cancel button is clicked
     let prefs_win_cancel = prefs_win_rc.clone();
     cancel_button.set_callback(move |_| {
         prefs_win_cancel.borrow_mut().hide();

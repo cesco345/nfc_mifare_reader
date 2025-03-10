@@ -1,4 +1,4 @@
-// src/inventory/ui/table.rs
+// src/inventory/ui/components/table.rs
 use fltk::{prelude::*, table::Table, draw};
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -23,7 +23,7 @@ pub fn setup_inventory_table(
     table.set_col_width(3, 80);  // Category Column
     
     // Set up header drawing callback
-    table.draw_cell(move |t, ctx, row, col, x, y, w, h| {
+    table.draw_cell(move |_t, ctx, row, col, x, y, w, h| {
         match ctx {
             fltk::table::TableContext::StartPage => draw::set_font(fltk::enums::Font::Helvetica, 14),
             fltk::table::TableContext::ColHeader => {
@@ -82,7 +82,7 @@ pub fn setup_inventory_table(
             let row = t.callback_row();
             if row < t.rows() && row >= 0 {
                 // Use set_row_selected instead of select_row
-                t.set_rows(row);
+                t.set_row_position(row);
                 on_selection(row as usize);
             }
         }

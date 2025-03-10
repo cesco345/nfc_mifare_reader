@@ -1,4 +1,4 @@
-//src/inventory/ui/form.rs
+//src/inventory/ui/components/form.rs
 use fltk::{
     input::{Input, MultilineInput},
     menu::Choice,
@@ -35,7 +35,7 @@ impl Clone for ItemForm {
     }
 }
 impl ItemForm {
-    pub fn new(x: i32, y: i32, w: i32, h: i32) -> Self {
+    pub fn new(x: i32, y: i32, w: i32, _h: i32) -> Self {
         let name_input = Input::new(x + 100, y, w - 100, 30, "Name:");
         let quantity_input = Input::new(x + 100, y + 40, w - 100, 30, "Quantity:");
         let category_choice = Choice::new(x + 100, y + 80, w - 100, 30, "Category:");

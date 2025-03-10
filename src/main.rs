@@ -183,7 +183,7 @@ fn main() {
     ui::create_batch_tab(&mut tabs, keyboard_layout.clone());
     
     // Try to initialize inventory tab with better error handling
-    let inventory_ui = match inventory::ui::actions::InventoryUI::new("inventory.db") {
+    let inventory_ui = match inventory::InventoryUI::new("inventory.db") {
         Ok(ui) => {
             println!("Successfully initialized inventory database");
             let ui_rc = Rc::new(ui);

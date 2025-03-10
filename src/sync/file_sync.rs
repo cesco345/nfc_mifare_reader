@@ -6,7 +6,8 @@ use std::path::{Path, PathBuf};
 use std::fs;
 use chrono::Local;
 use std::thread;
-use crate::inventory::ui::actions;
+use crate::inventory::InventoryUI;
+
 
 pub struct FileSync {
     import_path: String,
@@ -165,7 +166,7 @@ pub fn check_for_import_files(
     import_dir: &str,
     processed_dir: &str, 
     error_dir: &str,
-    inventory_ui: &std::rc::Rc<crate::inventory::ui::actions::InventoryUI>
+    inventory_ui: &std::rc::Rc<crate::inventory::InventoryUI>
 ) -> Result<usize, String> {
     let file_sync = FileSync::new(import_dir, processed_dir, error_dir);
     let pending_files = file_sync.get_pending_files();

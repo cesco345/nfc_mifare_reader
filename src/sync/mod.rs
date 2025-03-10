@@ -11,7 +11,7 @@ pub fn check_for_import_files(
     import_dir: &str, 
     processed_dir: &str, 
     error_dir: &str, 
-    inventory_ui: &std::rc::Rc<crate::inventory::ui::actions::InventoryUI>
+    inventory_ui: &std::rc::Rc<crate::inventory::InventoryUI>
 ) -> Result<usize, String> {
     // Implementation moved from main.rs
     // This would process import files using the inventory UI instance

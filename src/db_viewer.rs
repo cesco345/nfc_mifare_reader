@@ -13,7 +13,8 @@ use fltk::{
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub fn show_database_viewer(inventory_ui: &Rc<crate::inventory::ui::actions::InventoryUI>) {
+
+pub fn show_database_viewer(inventory_ui: &Rc<crate::inventory::InventoryUI>) {
     // Create the main window
     let app = app::App::default();
     let mut win = Window::new(100, 100, 960, 620, "Database Viewer");

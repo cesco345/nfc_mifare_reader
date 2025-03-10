@@ -11,7 +11,8 @@ pub struct MenuItems {
     pub keyboard_layout: Rc<RefCell<i32>>,
     pub config: Rc<RefCell<crate::config::AppConfig>>,
     pub card_buffer: Rc<RefCell<fltk::text::TextBuffer>>,
-    pub inventory_ui: Rc<crate::inventory::ui::actions::InventoryUI>,
+    pub inventory_ui: Rc<crate::inventory::InventoryUI>,
+    
 }
 
 pub fn create_menu(wind: &mut fltk::window::Window) -> (app::Receiver<String>, MenuItems) {
@@ -35,7 +36,7 @@ pub fn create_menu(wind: &mut fltk::window::Window) -> (app::Receiver<String>, M
         keyboard_layout: Rc::new(RefCell::new(0)),
         config: Rc::new(RefCell::new(crate::config::AppConfig::default())),
         card_buffer: Rc::new(RefCell::new(fltk::text::TextBuffer::default())),
-        inventory_ui: Rc::new(crate::inventory::ui::actions::InventoryUI::new("").unwrap()), // This will be replaced
+        inventory_ui: Rc::new(crate::inventory::InventoryUI::new("").unwrap()), // This will be replaced
     })
 }
 
